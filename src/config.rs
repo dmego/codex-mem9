@@ -34,10 +34,18 @@ pub fn load_runtime_config() -> Result<RuntimeConfig> {
     let default_state_path = project_dirs.data_dir().join("state.json");
 
     let file_config = if default_config_path.exists() {
-        let raw = fs::read_to_string(&default_config_path)
-            .with_context(|| format!("failed to read config file: {}", default_config_path.display()))?;
-        toml::from_str::<FileConfig>(&raw)
-            .with_context(|| format!("failed to parse config file: {}", default_config_path.display()))?
+        let raw = fs::read_to_string(&default_config_path).with_context(|| {
+            format!(
+                "failed to read config file: {}",
+                default_config_path.display()
+            )
+        })?;
+        toml::from_str::<FileConfig>(&raw).with_context(|| {
+            format!(
+                "failed to parse config file: {}",
+                default_config_path.display()
+            )
+        })?
     } else {
         FileConfig::default()
     };
@@ -46,7 +54,9 @@ pub fn load_runtime_config() -> Result<RuntimeConfig> {
         .ok()
         .filter(|value| !value.trim().is_empty())
         .or(file_config.tenant_id)
-        .context("missing MEM9_TENANT_ID; provide it through the local environment or config file")?;
+        .context(
+            "missing MEM9_TENANT_ID; provide it through the local environment or config file",
+        )?;
 
     let api_key = env::var("MEM9_API_KEY")
         .ok()

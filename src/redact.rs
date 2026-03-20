@@ -1,9 +1,8 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-static SESSION_JSONL_TICKED: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"`~\/\.codex\/sessions\/[^`]*?\.jsonl`").expect("valid regex")
-});
+static SESSION_JSONL_TICKED: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"`~\/\.codex\/sessions\/[^`]*?\.jsonl`").expect("valid regex"));
 static SESSION_JSONL_PLAIN: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"~\/\.codex\/sessions\/\S*?\.jsonl").expect("valid regex"));
 static LOOPBACK_URL: Lazy<Regex> = Lazy::new(|| {
@@ -22,9 +21,8 @@ static PRIVATE_HOST: Lazy<Regex> = Lazy::new(|| {
         .expect("valid regex")
 });
 static INLINE_CODE: Lazy<Regex> = Lazy::new(|| Regex::new(r"`([^`]+)`").expect("valid regex"));
-static EXPLICIT_PATH: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"^(~|\./|\.\./|/)[^\s]*$").expect("valid regex")
-});
+static EXPLICIT_PATH: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(~|\./|\.\./|/)[^\s]*$").expect("valid regex"));
 
 pub fn sanitize_mem9_content(value: &str) -> String {
     let text = SESSION_JSONL_TICKED
@@ -34,20 +32,30 @@ pub fn sanitize_mem9_content(value: &str) -> String {
         .replace_all(&text, "Codex session rollout JSONL file")
         .to_string();
     let text = LOOPBACK_URL
-        .replace_all(&text, |caps: &regex::Captures| replace_loopback(caps.name("port").map(|m| m.as_str())))
+        .replace_all(&text, |caps: &regex::Captures| {
+            replace_loopback(caps.name("port").map(|m| m.as_str()))
+        })
         .to_string();
     let text = LOOPBACK_HOST
-        .replace_all(&text, |caps: &regex::Captures| replace_loopback(caps.name("port").map(|m| m.as_str())))
+        .replace_all(&text, |caps: &regex::Captures| {
+            replace_loopback(caps.name("port").map(|m| m.as_str()))
+        })
         .to_string();
     let text = PRIVATE_URL
-        .replace_all(&text, |caps: &regex::Captures| replace_private(caps.name("port").map(|m| m.as_str())))
+        .replace_all(&text, |caps: &regex::Captures| {
+            replace_private(caps.name("port").map(|m| m.as_str()))
+        })
         .to_string();
     let text = PRIVATE_HOST
-        .replace_all(&text, |caps: &regex::Captures| replace_private(caps.name("port").map(|m| m.as_str())))
+        .replace_all(&text, |caps: &regex::Captures| {
+            replace_private(caps.name("port").map(|m| m.as_str()))
+        })
         .to_string();
 
     INLINE_CODE
-        .replace_all(&text, |caps: &regex::Captures| simplify_inline_code(caps.get(1).map(|m| m.as_str()).unwrap_or("")))
+        .replace_all(&text, |caps: &regex::Captures| {
+            simplify_inline_code(caps.get(1).map(|m| m.as_str()).unwrap_or(""))
+        })
         .to_string()
 }
 
@@ -67,12 +75,29 @@ fn replace_private(port: Option<&str>) -> String {
 
 fn simplify_inline_code(code: &str) -> String {
     let lowered = code.to_lowercase();
-    if lowered.contains("http://") || lowered.contains("https://") || lowered.contains("127.0.0.1") || lowered.contains("localhost") {
+    if lowered.contains("http://")
+        || lowered.contains("https://")
+        || lowered.contains("127.0.0.1")
+        || lowered.contains("localhost")
+    {
         return "related address".to_string();
     }
-    if ["curl", "git", "npm", "npx", "pnpm", "node", "python", "codex", "gh ", "mvn", "launchctl", "@"]
-        .iter()
-        .any(|token| lowered.contains(token))
+    if [
+        "curl",
+        "git",
+        "npm",
+        "npx",
+        "pnpm",
+        "node",
+        "python",
+        "codex",
+        "gh ",
+        "mvn",
+        "launchctl",
+        "@",
+    ]
+    .iter()
+    .any(|token| lowered.contains(token))
     {
         return "related command".to_string();
     }

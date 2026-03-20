@@ -35,7 +35,10 @@ impl Mem9Client {
     }
 
     pub async fn store(&self, payload: &StorePayload) -> Result<()> {
-        let url = format!("{}/v1alpha2/mem9s/memories", self.api_url.trim_end_matches('/'));
+        let url = format!(
+            "{}/v1alpha2/mem9s/memories",
+            self.api_url.trim_end_matches('/')
+        );
         self.client
             .post(url)
             .json(payload)

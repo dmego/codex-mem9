@@ -9,7 +9,7 @@ use std::time::Duration;
 use anyhow::Result;
 use tokio::signal;
 
-pub use config::{load_runtime_config, RuntimeConfig};
+pub use config::{RuntimeConfig, load_runtime_config};
 pub use importer::SyncStats;
 
 pub async fn run_sync(config: &RuntimeConfig) -> Result<SyncStats> {
@@ -43,7 +43,8 @@ async fn shutdown_signal() {
     {
         use tokio::signal::unix::{SignalKind, signal};
 
-        let mut sigterm = signal(SignalKind::terminate()).expect("failed to install SIGTERM handler");
+        let mut sigterm =
+            signal(SignalKind::terminate()).expect("failed to install SIGTERM handler");
         tokio::select! {
             _ = signal::ctrl_c() => {}
             _ = sigterm.recv() => {}
@@ -80,7 +81,8 @@ mod tests {
 
     #[tokio::test]
     async fn wait_for_next_cycle_ticks_when_no_shutdown_arrives() {
-        let should_stop = wait_for_next_cycle(Duration::from_millis(1), std::future::pending()).await;
+        let should_stop =
+            wait_for_next_cycle(Duration::from_millis(1), std::future::pending()).await;
         assert!(!should_stop);
     }
 }

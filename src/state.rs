@@ -23,16 +23,25 @@ impl SyncState {
 
     pub fn save(&self, path: &Path) -> Result<()> {
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)
-                .with_context(|| format!("failed to create state directory: {}", parent.display()))?;
+            fs::create_dir_all(parent).with_context(|| {
+                format!("failed to create state directory: {}", parent.display())
+            })?;
         }
 
         let raw = serde_json::to_string_pretty(self)?;
         let tmp_path = path.with_extension("tmp");
-        fs::write(&tmp_path, format!("{raw}\n"))
-            .with_context(|| format!("failed to write temporary state file: {}", tmp_path.display()))?;
-        fs::rename(&tmp_path, path)
-            .with_context(|| format!("failed to replace state file atomically: {}", path.display()))
+        fs::write(&tmp_path, format!("{raw}\n")).with_context(|| {
+            format!(
+                "failed to write temporary state file: {}",
+                tmp_path.display()
+            )
+        })?;
+        fs::rename(&tmp_path, path).with_context(|| {
+            format!(
+                "failed to replace state file atomically: {}",
+                path.display()
+            )
+        })
     }
 
     pub fn mark_imported(&mut self, fingerprint: String) {
