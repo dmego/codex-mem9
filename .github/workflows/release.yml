@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build And Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Verify project
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --all-targets --all-features -- -D warnings
+          cargo test --all-features
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Create source archive
+        run: |
+          tag_name="${GITHUB_REF_NAME}"
+          archive_name="code-mem9-${tag_name}.tar.gz"
+          git archive --format=tar.gz --output "${archive_name}" "${tag_name}"
+          shasum -a 256 "${archive_name}" > "${archive_name}.sha256"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            code-mem9-${{ github.ref_name }}.tar.gz
+            code-mem9-${{ github.ref_name }}.tar.gz.sha256
+          generate_release_notes: true

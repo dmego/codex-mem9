@@ -42,7 +42,7 @@ Use these direct curl operations when you need explicit manual control.
 
 Authentication rule:
 
-- Always send header `X-API-Key: ${MEM9_API_KEY:-$MEM9_TENANT_ID}`
+- Default to tenant-scoped API usage with `MEM9_TENANT_ID`.
 - Default API root is `${MEM9_API_URL:-https://api.mem9.ai}`
 
 ### memory_store
@@ -51,10 +51,9 @@ Create a new memory:
 
 ```bash
 curl -sf --max-time 8 \
-  -H "X-API-Key: ${MEM9_API_KEY:-$MEM9_TENANT_ID}" \
   -H "Content-Type: application/json" \
   -d '{"content":"User prefers Simplified Chinese responses.","tags":["user-preference","codex"],"source":"codex"}' \
-  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha2/mem9s/memories"
+  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha1/mem9s/${MEM9_TENANT_ID}/memories"
 ```
 
 ### memory_search
@@ -63,8 +62,7 @@ Search memories by query:
 
 ```bash
 curl -sf --max-time 8 \
-  -H "X-API-Key: ${MEM9_API_KEY:-$MEM9_TENANT_ID}" \
-  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha2/mem9s/memories?q=codex%20mem9%20tenant%20setup&limit=5"
+  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha1/mem9s/${MEM9_TENANT_ID}/memories?q=codex%20mem9%20tenant%20setup&limit=5"
 ```
 
 ### memory_get
@@ -73,8 +71,7 @@ Read one memory by id:
 
 ```bash
 curl -sf --max-time 8 \
-  -H "X-API-Key: ${MEM9_API_KEY:-$MEM9_TENANT_ID}" \
-  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha2/mem9s/memories/<memory-id>"
+  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha1/mem9s/${MEM9_TENANT_ID}/memories/<memory-id>"
 ```
 
 ### memory_update
@@ -84,10 +81,9 @@ Update one memory by id:
 ```bash
 curl -sf --max-time 8 \
   -X PUT \
-  -H "X-API-Key: ${MEM9_API_KEY:-$MEM9_TENANT_ID}" \
   -H "Content-Type: application/json" \
   -d '{"content":"Updated durable memory content.","tags":["codex","project-decision"]}' \
-  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha2/mem9s/memories/<memory-id>"
+  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha1/mem9s/${MEM9_TENANT_ID}/memories/<memory-id>"
 ```
 
 ### memory_delete
@@ -97,8 +93,7 @@ Delete one memory by id:
 ```bash
 curl -sf --max-time 8 \
   -X DELETE \
-  -H "X-API-Key: ${MEM9_API_KEY:-$MEM9_TENANT_ID}" \
-  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha2/mem9s/memories/<memory-id>"
+  "${MEM9_API_URL:-https://api.mem9.ai}/v1alpha1/mem9s/${MEM9_TENANT_ID}/memories/<memory-id>"
 ```
 
 ## Safety Rules
