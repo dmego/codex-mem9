@@ -4,6 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FORMULA_PATH="${ROOT_DIR}/Formula/codex-mem9.rb"
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/codex-mem9-homebrew-smoke.XXXXXX")"
+TAP_NAME="codex/smoke"
+TAP_DIR="${WORK_DIR}/homebrew-tap"
+TAP_FORMULA_DIR="${TAP_DIR}/Formula"
 PORT_FILE="${WORK_DIR}/port"
 REQUESTS_FILE="${WORK_DIR}/requests.log"
 HOME_DIR="${WORK_DIR}/home"
@@ -16,6 +19,8 @@ cleanup() {
     kill "${SERVER_PID}" >/dev/null 2>&1 || true
     wait "${SERVER_PID}" >/dev/null 2>&1 || true
   fi
+  brew uninstall --force codex-mem9 >/dev/null 2>&1 || true
+  brew untap "${TAP_NAME}" >/dev/null 2>&1 || true
   rm -rf "${WORK_DIR}"
 }
 
@@ -23,13 +28,14 @@ trap cleanup EXIT
 
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-if brew list --versions codex-mem9 >/dev/null 2>&1; then
-  brew reinstall --build-from-source "${FORMULA_PATH}"
-else
-  brew install --build-from-source "${FORMULA_PATH}"
-fi
+mkdir -p "${TAP_FORMULA_DIR}"
+cp "${FORMULA_PATH}" "${TAP_FORMULA_DIR}/codex-mem9.rb"
 
-brew test codex-mem9
+brew untap "${TAP_NAME}" >/dev/null 2>&1 || true
+brew tap "${TAP_NAME}" "${TAP_DIR}"
+brew install --build-from-source "${TAP_NAME}/codex-mem9"
+
+brew test "${TAP_NAME}/codex-mem9"
 
 PORT_FILE="${PORT_FILE}" REQUESTS_FILE="${REQUESTS_FILE}" python3 -u - <<'PY' &
 import json
@@ -91,7 +97,7 @@ if [[ ! -s "${PORT_FILE}" ]]; then
 fi
 
 PORT="$(<"${PORT_FILE}")"
-INSTALLED_BIN="$(brew --prefix codex-mem9)/bin/codex-mem9"
+INSTALLED_BIN="$(brew --prefix "${TAP_NAME}/codex-mem9")/bin/codex-mem9"
 
 mkdir -p "${MEMORIES_DIR}"
 printf '%s\n' \
