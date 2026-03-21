@@ -7,6 +7,7 @@ WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/codex-mem9-homebrew-smoke.XXXXXX")"
 TAP_NAME="codex/smoke"
 TAP_DIR="${WORK_DIR}/homebrew-tap"
 TAP_FORMULA_DIR="${TAP_DIR}/Formula"
+LOCAL_ARCHIVE="${WORK_DIR}/codex-mem9-smoke.tar.gz"
 PORT_FILE="${WORK_DIR}/port"
 REQUESTS_FILE="${WORK_DIR}/requests.log"
 HOME_DIR="${WORK_DIR}/home"
@@ -30,6 +31,18 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 mkdir -p "${TAP_FORMULA_DIR}"
 cp "${FORMULA_PATH}" "${TAP_FORMULA_DIR}/codex-mem9.rb"
+git -C "${ROOT_DIR}" archive --format=tar.gz --output "${LOCAL_ARCHIVE}" HEAD
+LOCAL_ARCHIVE="${LOCAL_ARCHIVE}" python3 - <<'PY'
+import os
+import pathlib
+import re
+
+formula_path = pathlib.Path(os.environ["LOCAL_ARCHIVE"]).parent / "homebrew-tap" / "Formula" / "codex-mem9.rb"
+archive_url = pathlib.Path(os.environ["LOCAL_ARCHIVE"]).resolve().as_uri()
+text = formula_path.read_text()
+text = re.sub(r'^\s*url\s+".*"$', f'  url "{archive_url}"', text, count=1, flags=re.M)
+formula_path.write_text(text)
+PY
 git -C "${TAP_DIR}" init >/dev/null 2>&1
 git -C "${TAP_DIR}" add Formula/codex-mem9.rb
 git -C "${TAP_DIR}" -c user.name="codex-mem9-ci" -c user.email="ci@example.invalid" \
