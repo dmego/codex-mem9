@@ -12,9 +12,16 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  release:
-    name: Build And Publish Release
-    runs-on: ubuntu-latest
+  verify:
+    name: Verify Release (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
 
     steps:
       - name: Checkout
@@ -31,6 +38,35 @@ jobs:
           cargo fmt --all -- --check
           cargo clippy --all-targets --all-features -- -D warnings
           cargo test --all-features
+
+  homebrew-smoke:
+    name: Homebrew Smoke (macOS)
+    runs-on: macos-latest
+    needs: verify
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run Homebrew smoke test
+        run: bash scripts/homebrew-smoke-test.sh
+
+  release:
+    name: Build And Publish Release
+    runs-on: ubuntu-latest
+    needs:
+      - verify
+      - homebrew-smoke
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
 
       - name: Build release binary
         run: cargo build --release

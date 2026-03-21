@@ -20,6 +20,9 @@ static PRIVATE_HOST: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"`?(?:10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?::(?P<port>\d+))?`?")
         .expect("valid regex")
 });
+static BARE_EXPLICIT_PATH: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"(?P<prefix>^|[\s(])(?P<path>(?:~|/|\./|\.\./)[^\s)`]+)").expect("valid regex")
+});
 static INLINE_CODE: Lazy<Regex> = Lazy::new(|| Regex::new(r"`([^`]+)`").expect("valid regex"));
 static EXPLICIT_PATH: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^(~|\./|\.\./|/)[^\s]*$").expect("valid regex"));
@@ -49,6 +52,12 @@ pub fn sanitize_mem9_content(value: &str) -> String {
     let text = PRIVATE_HOST
         .replace_all(&text, |caps: &regex::Captures| {
             replace_private(caps.name("port").map(|m| m.as_str()))
+        })
+        .to_string();
+    let text = BARE_EXPLICIT_PATH
+        .replace_all(&text, |caps: &regex::Captures| {
+            let prefix = caps.name("prefix").map(|m| m.as_str()).unwrap_or("");
+            format!("{prefix}related path")
         })
         .to_string();
 
@@ -142,5 +151,13 @@ mod tests {
         let text = "Read `~/project/file.txt` before continuing.";
         let sanitized = sanitize_mem9_content(text);
         assert!(sanitized.contains("related path"));
+    }
+
+    #[test]
+    fn redacts_bare_explicit_paths() {
+        let text = "Read /Users/example/project/file.txt before continuing.";
+        let sanitized = sanitize_mem9_content(text);
+        assert!(sanitized.contains("related path"));
+        assert!(!sanitized.contains("/Users/example/project/file.txt"));
     }
 }

@@ -52,39 +52,53 @@ Rust CLI 提供两个命令：
 
 ## 配置
 
-在交互式使用 skills 或 CLI 之前，先设置这些环境变量：
+初始化规则：
+
+- 先安装所需的 skill 目录，再运行 `mem9-setup`
+- `mem9-setup` 是 skill，不属于 Homebrew formula
+- 第一次使用先运行 `mem9-setup`
+- `mem9-setup` 应把 `MEM9_TENANT_ID` 同时写入启动 Codex 的默认 shell 环境和 `~/.codex/config.toml`
+
+交互式 skills 和 CLI 命令会优先读取当前进程环境变量：
 
 ```bash
 export MEM9_TENANT_ID="<your-tenant-id>"
 export MEM9_API_URL="https://api.mem9.ai"
 ```
 
-如果你的 mem9 部署在 `v1alpha2` 接口上要求 API key，也可以额外导出：
+`codex-mem9` 在写入 `v1alpha2` Mem9 接口时会使用 `X-API-Key`。在默认的 Mem9 用法里，它会直接复用 `MEM9_TENANT_ID` 的值，因此通常不需要额外的 API key。
+
+只有在你的部署明确使用不同值时，才需要额外设置 `MEM9_API_KEY`：
 
 ```bash
 export MEM9_API_KEY="<your-api-key>"
 ```
 
-对于 `brew services`，launchd 不会读取交互式 shell 配置。启动 `codex-mem9` 服务前，使用下面两种方式之一：
+`codex-mem9` 的运行时读取顺序是：
 
-1. 把运行配置写入 `~/Library/Application Support/ai.dmego.codex-mem9/config.toml`：
+1. 进程环境变量
+2. `~/.codex/config.toml` 里的 `[codex_mem9]`
+
+对于新的 `brew services` 安装，不要依赖 `launchctl setenv`。后台服务的持久化配置应写到 `~/.codex/config.toml`：
 
 ```toml
+[codex_mem9]
 tenant_id = "<your-tenant-id>"
 api_url = "https://api.mem9.ai"
-# api_key = "<your-api-key>"
+# api_key = "<your-api-key-if-different>"
 ```
 
-2. 或者先把环境变量写入 launchd，再重启服务：
-
-```bash
-launchctl setenv MEM9_TENANT_ID "<your-tenant-id>"
-launchctl setenv MEM9_API_URL "https://api.mem9.ai"
-# launchctl setenv MEM9_API_KEY "<your-api-key>"
-brew services restart codex-mem9
-```
+如果进程环境变量和 `~/.codex/config.toml` 中的 `[codex_mem9]` 都没有提供 tenant，`codex-mem9` 会在启动时退出，并把明确的错误信息写到 Homebrew service 的 stderr 日志里。
 
 ## 通过 Homebrew 安装 `codex-mem9`
+
+这里只安装 CLI 和后台服务，不会安装 skills。
+
+Homebrew 说明：
+
+- `brew install codex-mem9` 安装的是 `dmego/tap` 里最新已发布的 tag。
+- 当前仓库工作树可能已经领先于这个已发布 tag。
+- 如果 tap formula 仍然指向较旧的已发布 tag，那么实际安装出来的二进制和服务行为仍然会继续跟随那个旧 tag，直到新的 tag 发布为止。
 
 ```bash
 brew tap dmego/tap
@@ -138,12 +152,13 @@ skills/using-mem9
 
 如果要给 Codex 完整接入：
 
-1. 通过 Homebrew 安装 `codex-mem9`。
-2. 在启动 Codex 的环境中导出 `MEM9_TENANT_ID` 和 `MEM9_API_URL`。
-3. 如果你的 mem9 部署要求，也导出 `MEM9_API_KEY`。
-4. 把 `skills/` 里的所需目录安装到 Codex 的 skills 目录。
-5. 先为 Homebrew 服务配置 launchd 环境或配置文件。
-6. 通过 `brew services start codex-mem9` 启动后台服务。
+1. 先把 `skills/` 里的所需目录安装到 Codex 的 skills 目录。
+2. 运行 `mem9-setup`。
+3. 通过 Homebrew 安装 `codex-mem9`。
+4. 如果你使用 Homebrew 后台服务，确认 `mem9-setup` 已把 `[codex_mem9]` 写入 `~/.codex/config.toml`。
+5. 通过 `brew services start codex-mem9` 启动后台服务。
+
+如果你是在匹配 release tag 之前先验证本仓库里的变更，要记住：`brew install codex-mem9` 仍然跟随最新已发布 tag，而不是当前工作树。
 
 这样 Codex 会同时具备两部分能力：
 

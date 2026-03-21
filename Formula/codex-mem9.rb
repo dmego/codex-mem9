@@ -1,8 +1,8 @@
 class CodexMem9 < Formula
   desc "Sync and watch Codex memories into Mem9 with redaction"
   homepage "https://github.com/dmego/codex-mem9"
-  url "https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.2.tar.gz"
-  version "0.1.2"
+  url "https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.3.tar.gz"
+  version "0.1.3"
   license "MIT"
 
   depends_on "rust" => :build
@@ -20,21 +20,20 @@ class CodexMem9 < Formula
 
   def caveats
     <<~EOS
-      For `brew services`, launchd does not load your interactive shell profile.
+      Homebrew installs the `codex-mem9` binary and service only.
+      Install the skills from the repository separately before you try to run
+      the `mem9-setup` skill.
 
-      Configure Mem9 for the service with either:
-        1. #{Dir.home}/Library/Application Support/ai.dmego.codex-mem9/config.toml
-           tenant_id = "<your-tenant-id>"
-           api_url = "https://api.mem9.ai"
-        2. launchctl setenv MEM9_TENANT_ID "<your-tenant-id>"
-           launchctl setenv MEM9_API_URL "https://api.mem9.ai"
-           brew services restart codex-mem9
+      This Formula installs the published release referenced above (#{version}).
+      The installed behavior follows that release tag, not unreleased repository changes.
 
-      If your Mem9 deployment requires it, also set MEM9_API_KEY in the same place.
+      Review the README that matches the same published release before configuring
+      `brew services`, because configuration behavior can change between tags.
     EOS
   end
 
   test do
-    assert_match "sync", shell_output("#{bin}/codex-mem9 --help")
+    output = shell_output("#{bin}/codex-mem9 sync 2>&1", 1)
+    assert_match "missing MEM9_TENANT_ID", output
   end
 end

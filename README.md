@@ -52,39 +52,53 @@ The service reads from `~/.codex/memories`, skips `raw_memories.md`, applies red
 
 ## Configuration
 
-Set the required environment variables before using the skills or the CLI interactively:
+Initialization rule:
+
+- Install the required skill folders before you try to run `mem9-setup`
+- `mem9-setup` is a skill, not part of the Homebrew formula
+- On first use, run `mem9-setup`
+- `mem9-setup` should persist `MEM9_TENANT_ID` into both the default shell environment and `~/.codex/config.toml`
+
+Interactive skills and CLI commands use the current process environment first:
 
 ```bash
 export MEM9_TENANT_ID="<your-tenant-id>"
 export MEM9_API_URL="https://api.mem9.ai"
 ```
 
-If your mem9 deployment expects an API key for `v1alpha2` endpoints, you can also export:
+`codex-mem9` uses `X-API-Key` when it writes to the `v1alpha2` Mem9 endpoint. In the default Mem9 setup, it reuses the same value as `MEM9_TENANT_ID`, so a separate API key is not required.
+
+Only set `MEM9_API_KEY` if your deployment intentionally uses a different value:
 
 ```bash
 export MEM9_API_KEY="<your-api-key>"
 ```
 
-For `brew services`, launchd does not read your interactive shell profile. Use one of these service-safe options before starting `codex-mem9`:
+`codex-mem9` runtime precedence is:
 
-1. Persist the runtime config in `~/Library/Application Support/ai.dmego.codex-mem9/config.toml`:
+1. process environment
+2. `[codex_mem9]` in `~/.codex/config.toml`
+
+For new Homebrew service installs, do not rely on `launchctl setenv`. Keep the persistent service configuration in `~/.codex/config.toml`:
 
 ```toml
+[codex_mem9]
 tenant_id = "<your-tenant-id>"
 api_url = "https://api.mem9.ai"
-# api_key = "<your-api-key>"
+# api_key = "<your-api-key-if-different>"
 ```
 
-2. Or export the variables into launchd and then restart the service:
-
-```bash
-launchctl setenv MEM9_TENANT_ID "<your-tenant-id>"
-launchctl setenv MEM9_API_URL "https://api.mem9.ai"
-# launchctl setenv MEM9_API_KEY "<your-api-key>"
-brew services restart codex-mem9
-```
+If neither the process environment nor `[codex_mem9]` in `~/.codex/config.toml` provides a tenant, `codex-mem9` exits on startup and writes a clear error into the Homebrew service stderr log.
 
 ## Install `codex-mem9` with Homebrew
+
+This installs the CLI and background service only. It does not install the skills.
+
+Homebrew note:
+
+- `brew install codex-mem9` installs the latest published tag from `dmego/tap`.
+- The current repository working tree can be ahead of that published tag.
+- If the tap formula still references an older published tag, the installed binary and service behavior still follow that older tag until a newer one is published.
 
 ```bash
 brew tap dmego/tap
@@ -138,12 +152,13 @@ After installation, the agent can read the skill definitions directly from the s
 
 To use the full setup with Codex:
 
-1. Install `codex-mem9` with Homebrew.
-2. Export `MEM9_TENANT_ID` and `MEM9_API_URL` in the environment used to launch Codex.
-3. If your mem9 deployment expects it, export `MEM9_API_KEY` too.
-4. Install the required skill folders from `skills/` into the Codex skills directory.
-5. Configure launchd or the config file for the Homebrew service.
-6. Start the background service with `brew services start codex-mem9`.
+1. Install the required skill folders from `skills/` into the Codex skills directory.
+2. Run `mem9-setup`.
+3. Install `codex-mem9` with Homebrew.
+4. If you use the Homebrew service, confirm that `mem9-setup` wrote `[codex_mem9]` into `~/.codex/config.toml`.
+5. Start the background service with `brew services start codex-mem9`.
+
+If you are validating changes from this repository before a matching release tag exists, remember that `brew install codex-mem9` still follows the latest published tag, not the current working tree.
 
 This gives Codex both parts of the integration:
 

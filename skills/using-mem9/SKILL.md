@@ -7,6 +7,11 @@ description: Use when any Mem9-related behavior is needed in Codex, and prefer t
 
 This skill is the main Mem9 entrypoint for Codex. Route first, then either use `mem9-setup`, `mem9-recall`, `mem9-store`, or stay here for direct curl-based CRUD operations.
 
+First-use rule:
+
+- If Mem9 has not been initialized for this Codex environment yet, you must route to `mem9-setup` before doing anything else.
+- `mem9-setup` is also the validator for tenant configuration reuse. If a tenant value was copied manually, restored from old shell files, or otherwise looks stale or uncertain, route to `mem9-setup` again before using CRUD operations.
+
 ## When to Use
 
 Use this skill whenever Mem9 might help:
@@ -27,11 +32,17 @@ Follow this order every time:
 3. If the conversation produced a durable preference, decision, or long-term fact, route to `mem9-store`.
 4. If none of the above applies, stay in `using-mem9` and use the direct curl CRUD operations below.
 
+Setup validation rule:
+
+- `mem9-setup` performs the required dual validation before a tenant is trusted for reuse: an explicit tenant-scoped `v1alpha1` check for `MEM9_TENANT_ID`, plus a `v1alpha2` service-auth check using `X-API-Key`.
+- The CRUD examples in this skill assume that `mem9-setup` has already completed that dual validation. These examples are not a substitute for tenant validation.
+
 ## Skill Routing
 
 These Mem9 skills are complementary. This skill is the router:
 
-- Route to `mem9-setup` when `MEM9_TENANT_ID` is missing or Mem9 is not configured in the local environment.
+- Route to `mem9-setup` when `MEM9_TENANT_ID` is missing, when this looks like first-time Mem9 usage, or when Mem9 is not configured in the local environment.
+- Route to `mem9-setup` again when a tenant value exists but its source or validity is uncertain for the current environment.
 - Route to `mem9-recall` when Codex should proactively pull in relevant history before answering.
 - Route to `mem9-store` when Codex should proactively save a durable preference, decision, or long-term fact.
 - Stay in `using-mem9` when you need direct CRUD operations such as search, inspect, update, or delete by memory id.
@@ -44,6 +55,7 @@ Authentication rule:
 
 - Default to tenant-scoped API usage with `MEM9_TENANT_ID`.
 - Default API root is `${MEM9_API_URL:-https://api.mem9.ai}`
+- `~/.codex/config.toml` is a fallback for the `codex-mem9` Homebrew service, not for these direct curl commands
 
 ### memory_store
 
