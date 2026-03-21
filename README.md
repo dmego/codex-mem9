@@ -52,7 +52,7 @@ The service reads from `~/.codex/memories`, skips `raw_memories.md`, applies red
 
 ## Configuration
 
-Set the required environment variables before using the skills or the CLI:
+Set the required environment variables before using the skills or the CLI interactively:
 
 ```bash
 export MEM9_TENANT_ID="<your-tenant-id>"
@@ -63,6 +63,25 @@ If your mem9 deployment expects an API key for `v1alpha2` endpoints, you can als
 
 ```bash
 export MEM9_API_KEY="<your-api-key>"
+```
+
+For `brew services`, launchd does not read your interactive shell profile. Use one of these service-safe options before starting `codex-mem9`:
+
+1. Persist the runtime config in `~/Library/Application Support/ai.dmego.codex-mem9/config.toml`:
+
+```toml
+tenant_id = "<your-tenant-id>"
+api_url = "https://api.mem9.ai"
+# api_key = "<your-api-key>"
+```
+
+2. Or export the variables into launchd and then restart the service:
+
+```bash
+launchctl setenv MEM9_TENANT_ID "<your-tenant-id>"
+launchctl setenv MEM9_API_URL "https://api.mem9.ai"
+# launchctl setenv MEM9_API_KEY "<your-api-key>"
+brew services restart codex-mem9
 ```
 
 ## Install `codex-mem9` with Homebrew
@@ -123,7 +142,8 @@ To use the full setup with Codex:
 2. Export `MEM9_TENANT_ID` and `MEM9_API_URL` in the environment used to launch Codex.
 3. If your mem9 deployment expects it, export `MEM9_API_KEY` too.
 4. Install the required skill folders from `skills/` into the Codex skills directory.
-5. Start the background service with `brew services start codex-mem9`.
+5. Configure launchd or the config file for the Homebrew service.
+6. Start the background service with `brew services start codex-mem9`.
 
 This gives Codex both parts of the integration:
 
@@ -141,4 +161,4 @@ Formula/codex-mem9.rb
 It uses the published repository path:
 
 - `homepage`: `https://github.com/dmego/codex-mem9`
-- `url`: `https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.0.tar.gz`
+- `url`: `https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.1.tar.gz`

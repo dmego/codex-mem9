@@ -52,7 +52,7 @@ Rust CLI 提供两个命令：
 
 ## 配置
 
-在使用 skills 或 CLI 之前，先设置这些环境变量：
+在交互式使用 skills 或 CLI 之前，先设置这些环境变量：
 
 ```bash
 export MEM9_TENANT_ID="<your-tenant-id>"
@@ -63,6 +63,25 @@ export MEM9_API_URL="https://api.mem9.ai"
 
 ```bash
 export MEM9_API_KEY="<your-api-key>"
+```
+
+对于 `brew services`，launchd 不会读取交互式 shell 配置。启动 `codex-mem9` 服务前，使用下面两种方式之一：
+
+1. 把运行配置写入 `~/Library/Application Support/ai.dmego.codex-mem9/config.toml`：
+
+```toml
+tenant_id = "<your-tenant-id>"
+api_url = "https://api.mem9.ai"
+# api_key = "<your-api-key>"
+```
+
+2. 或者先把环境变量写入 launchd，再重启服务：
+
+```bash
+launchctl setenv MEM9_TENANT_ID "<your-tenant-id>"
+launchctl setenv MEM9_API_URL "https://api.mem9.ai"
+# launchctl setenv MEM9_API_KEY "<your-api-key>"
+brew services restart codex-mem9
 ```
 
 ## 通过 Homebrew 安装 `codex-mem9`
@@ -123,7 +142,8 @@ skills/using-mem9
 2. 在启动 Codex 的环境中导出 `MEM9_TENANT_ID` 和 `MEM9_API_URL`。
 3. 如果你的 mem9 部署要求，也导出 `MEM9_API_KEY`。
 4. 把 `skills/` 里的所需目录安装到 Codex 的 skills 目录。
-5. 通过 `brew services start codex-mem9` 启动后台服务。
+5. 先为 Homebrew 服务配置 launchd 环境或配置文件。
+6. 通过 `brew services start codex-mem9` 启动后台服务。
 
 这样 Codex 会同时具备两部分能力：
 
@@ -141,4 +161,4 @@ Formula/codex-mem9.rb
 它使用以下发布仓库路径：
 
 - `homepage`：`https://github.com/dmego/codex-mem9`
-- `url`：`https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.0.tar.gz`
+- `url`：`https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.1.tar.gz`
