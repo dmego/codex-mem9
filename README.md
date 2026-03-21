@@ -1,6 +1,6 @@
 # codex-mem9
 
-[![Homebrew Version](https://img.shields.io/homebrew/v/codex-mem9?label=homebrew)](https://formulae.brew.sh/formula/codex-mem9)
+[![Homebrew Tap](https://img.shields.io/badge/homebrew-dmego%2Ftap-blue)](https://github.com/dmego/homebrew-tap)
 [![License](https://img.shields.io/github/license/dmego/codex-mem9)](./LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2024-orange)](./Cargo.toml)
 
