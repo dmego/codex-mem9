@@ -161,4 +161,4 @@ Formula/codex-mem9.rb
 It uses the published repository path:
 
 - `homepage`: `https://github.com/dmego/codex-mem9`
-- `url`: `https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.1.tar.gz`
+- `url`: `https://github.com/dmego/codex-mem9/archive/refs/tags/v<version>.tar.gz`

@@ -43,9 +43,11 @@ jobs:
           shasum -a 256 "${archive_name}" > "${archive_name}.sha256"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            codex-mem9-${{ github.ref_name }}.tar.gz
-            codex-mem9-${{ github.ref_name }}.tar.gz.sha256
-          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "codex-mem9-${GITHUB_REF_NAME}.tar.gz" \
+            "codex-mem9-${GITHUB_REF_NAME}.tar.gz.sha256" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --generate-notes
