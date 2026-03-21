@@ -1,20 +1,20 @@
-# code-mem9
+# codex-mem9
 
-[![Homebrew Version](https://img.shields.io/homebrew/v/code-mem9?label=homebrew)](https://formulae.brew.sh/formula/code-mem9)
-[![License](https://img.shields.io/github/license/dmego/code-mem9)](./LICENSE)
+[![Homebrew Version](https://img.shields.io/homebrew/v/codex-mem9?label=homebrew)](https://formulae.brew.sh/formula/codex-mem9)
+[![License](https://img.shields.io/github/license/dmego/codex-mem9)](./LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2024-orange)](./Cargo.toml)
 
 [English README](./README.md)
 
-`code-mem9` 提供两部分可安装内容，供 AI agent 使用：
+`codex-mem9` 提供两部分可安装内容，供 AI agent 使用：
 
 - `skills/`：给 Codex 一类 agent 使用的 Mem9 skills
-- `code-mem9`：通过 Homebrew 安装的 CLI 和后台服务，用于同步和监控 `~/.codex/memories`，脱敏后写入 Mem9
+- `codex-mem9`：通过 Homebrew 安装的 CLI 和后台服务，用于同步和监控 `~/.codex/memories`，脱敏后写入 Mem9
 
 ## 目录结构
 
 ```text
-code-mem9/
+codex-mem9/
 ├── skills/
 │   ├── mem9-recall/
 │   ├── mem9-setup/
@@ -41,7 +41,7 @@ code-mem9/
 
 这些目录用于支持 skill 机制的 agent 直接读取和安装。
 
-### `code-mem9`
+### `codex-mem9`
 
 Rust CLI 提供两个命令：
 
@@ -57,39 +57,44 @@ Rust CLI 提供两个命令：
 ```bash
 export MEM9_TENANT_ID="<your-tenant-id>"
 export MEM9_API_URL="https://api.mem9.ai"
+```
+
+如果你的 mem9 部署在 `v1alpha2` 接口上要求 API key，也可以额外导出：
+
+```bash
 export MEM9_API_KEY="<your-api-key>"
 ```
 
-## 通过 Homebrew 安装 `code-mem9`
+## 通过 Homebrew 安装 `codex-mem9`
 
 ```bash
 brew tap dmego/tap
-brew install code-mem9
+brew install codex-mem9
 ```
 
 检查已安装的 CLI：
 
 ```bash
-code-mem9 --help
+codex-mem9 --help
 ```
 
 执行一次手动同步：
 
 ```bash
-code-mem9 sync
+codex-mem9 sync
 ```
 
 启动后台服务：
 
 ```bash
-brew services start code-mem9
+brew services start codex-mem9
 ```
 
 停止或重启服务：
 
 ```bash
-brew services stop code-mem9
-brew services restart code-mem9
+brew services stop codex-mem9
+brew services restart codex-mem9
 brew services list
 ```
 
@@ -114,10 +119,11 @@ skills/using-mem9
 
 如果要给 Codex 完整接入：
 
-1. 通过 Homebrew 安装 `code-mem9`。
-2. 在启动 Codex 的环境中导出 `MEM9_TENANT_ID`、`MEM9_API_URL` 和 `MEM9_API_KEY`。
-3. 把 `skills/` 里的所需目录安装到 Codex 的 skills 目录。
-4. 通过 `brew services start code-mem9` 启动后台服务。
+1. 通过 Homebrew 安装 `codex-mem9`。
+2. 在启动 Codex 的环境中导出 `MEM9_TENANT_ID` 和 `MEM9_API_URL`。
+3. 如果你的 mem9 部署要求，也导出 `MEM9_API_KEY`。
+4. 把 `skills/` 里的所需目录安装到 Codex 的 skills 目录。
+5. 通过 `brew services start codex-mem9` 启动后台服务。
 
 这样 Codex 会同时具备两部分能力：
 
@@ -129,10 +135,10 @@ skills/using-mem9
 本仓库中的 Homebrew Formula 是：
 
 ```text
-Formula/code-mem9.rb
+Formula/codex-mem9.rb
 ```
 
 它使用以下发布仓库路径：
 
-- `homepage`：`https://github.com/dmego/code-mem9`
-- `url`：`https://github.com/dmego/code-mem9/archive/refs/tags/v0.1.0.tar.gz`
+- `homepage`：`https://github.com/dmego/codex-mem9`
+- `url`：`https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.0.tar.gz`

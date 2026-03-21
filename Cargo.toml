@@ -1,5 +1,5 @@
 [package]
-name = "code-mem9"
+name = "codex-mem9"
 version = "0.1.0"
 edition = "2024"
 description = "Codex memory sync and watch service with redaction and Homebrew support"

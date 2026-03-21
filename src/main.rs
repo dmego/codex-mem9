@@ -3,10 +3,10 @@ use std::time::Duration;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
-use code_mem9::{load_runtime_config, run_sync, run_watch};
+use codex_mem9::{load_runtime_config, run_sync, run_watch};
 
 #[derive(Parser, Debug)]
-#[command(name = "code-mem9")]
+#[command(name = "codex-mem9")]
 #[command(about = "Sync and watch Codex memories into Mem9 with redaction")]
 struct Cli {
     #[command(subcommand)]

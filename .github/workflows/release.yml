@@ -35,7 +35,7 @@ jobs:
       - name: Create source archive
         run: |
           tag_name="${GITHUB_REF_NAME}"
-          archive_name="code-mem9-${tag_name}.tar.gz"
+          archive_name="codex-mem9-${tag_name}.tar.gz"
           git archive --format=tar.gz --output "${archive_name}" "${tag_name}"
           shasum -a 256 "${archive_name}" > "${archive_name}.sha256"
 
@@ -43,6 +43,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            code-mem9-${{ github.ref_name }}.tar.gz
-            code-mem9-${{ github.ref_name }}.tar.gz.sha256
+            codex-mem9-${{ github.ref_name }}.tar.gz
+            codex-mem9-${{ github.ref_name }}.tar.gz.sha256
           generate_release_notes: true

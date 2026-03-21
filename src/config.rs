@@ -28,8 +28,8 @@ struct FileConfig {
 }
 
 pub fn load_runtime_config() -> Result<RuntimeConfig> {
-    let project_dirs = ProjectDirs::from("ai", "dmego", "code-mem9")
-        .context("failed to locate the local configuration directory for code-mem9")?;
+    let project_dirs = ProjectDirs::from("ai", "dmego", "codex-mem9")
+        .context("failed to locate the local configuration directory for codex-mem9")?;
     let default_config_path = project_dirs.config_dir().join("config.toml");
     let default_state_path = project_dirs.data_dir().join("state.json");
 

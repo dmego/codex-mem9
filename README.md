@@ -1,20 +1,20 @@
-# code-mem9
+# codex-mem9
 
-[![Homebrew Version](https://img.shields.io/homebrew/v/code-mem9?label=homebrew)](https://formulae.brew.sh/formula/code-mem9)
-[![License](https://img.shields.io/github/license/dmego/code-mem9)](./LICENSE)
+[![Homebrew Version](https://img.shields.io/homebrew/v/codex-mem9?label=homebrew)](https://formulae.brew.sh/formula/codex-mem9)
+[![License](https://img.shields.io/github/license/dmego/codex-mem9)](./LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2024-orange)](./Cargo.toml)
 
 [中文文档](./README.zh-CN.md)
 
-`code-mem9` provides two installable parts for AI agents:
+`codex-mem9` provides two installable parts for AI agents:
 
 - `skills/`: Mem9 skills for Codex-style agents
-- `code-mem9`: a Homebrew-installed CLI and background service that syncs and watches `~/.codex/memories`, redacts sensitive content, and stores sanitized entries into Mem9
+- `codex-mem9`: a Homebrew-installed CLI and background service that syncs and watches `~/.codex/memories`, redacts sensitive content, and stores sanitized entries into Mem9
 
 ## Repository layout
 
 ```text
-code-mem9/
+codex-mem9/
 ├── skills/
 │   ├── mem9-recall/
 │   ├── mem9-setup/
@@ -41,7 +41,7 @@ The `skills/` directory contains agent-readable skills:
 
 These files are meant to be read and installed by AI agent tooling that supports skill directories.
 
-### `code-mem9`
+### `codex-mem9`
 
 The Rust CLI provides two commands:
 
@@ -57,39 +57,44 @@ Set the required environment variables before using the skills or the CLI:
 ```bash
 export MEM9_TENANT_ID="<your-tenant-id>"
 export MEM9_API_URL="https://api.mem9.ai"
+```
+
+If your mem9 deployment expects an API key for `v1alpha2` endpoints, you can also export:
+
+```bash
 export MEM9_API_KEY="<your-api-key>"
 ```
 
-## Install `code-mem9` with Homebrew
+## Install `codex-mem9` with Homebrew
 
 ```bash
 brew tap dmego/tap
-brew install code-mem9
+brew install codex-mem9
 ```
 
 Check the installed CLI:
 
 ```bash
-code-mem9 --help
+codex-mem9 --help
 ```
 
 Run a one-time sync:
 
 ```bash
-code-mem9 sync
+codex-mem9 sync
 ```
 
 Start the background service:
 
 ```bash
-brew services start code-mem9
+brew services start codex-mem9
 ```
 
 Stop or restart the service:
 
 ```bash
-brew services stop code-mem9
-brew services restart code-mem9
+brew services stop codex-mem9
+brew services restart codex-mem9
 brew services list
 ```
 
@@ -114,10 +119,11 @@ After installation, the agent can read the skill definitions directly from the s
 
 To use the full setup with Codex:
 
-1. Install `code-mem9` with Homebrew.
-2. Export `MEM9_TENANT_ID`, `MEM9_API_URL`, and `MEM9_API_KEY` in the environment used to launch Codex.
-3. Install the required skill folders from `skills/` into the Codex skills directory.
-4. Start the background service with `brew services start code-mem9`.
+1. Install `codex-mem9` with Homebrew.
+2. Export `MEM9_TENANT_ID` and `MEM9_API_URL` in the environment used to launch Codex.
+3. If your mem9 deployment expects it, export `MEM9_API_KEY` too.
+4. Install the required skill folders from `skills/` into the Codex skills directory.
+5. Start the background service with `brew services start codex-mem9`.
 
 This gives Codex both parts of the integration:
 
@@ -129,10 +135,10 @@ This gives Codex both parts of the integration:
 The Homebrew formula in this repository is:
 
 ```text
-Formula/code-mem9.rb
+Formula/codex-mem9.rb
 ```
 
 It uses the published repository path:
 
-- `homepage`: `https://github.com/dmego/code-mem9`
-- `url`: `https://github.com/dmego/code-mem9/archive/refs/tags/v0.1.0.tar.gz`
+- `homepage`: `https://github.com/dmego/codex-mem9`
+- `url`: `https://github.com/dmego/codex-mem9/archive/refs/tags/v0.1.0.tar.gz`
