@@ -30,6 +30,10 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 mkdir -p "${TAP_FORMULA_DIR}"
 cp "${FORMULA_PATH}" "${TAP_FORMULA_DIR}/codex-mem9.rb"
+git -C "${TAP_DIR}" init >/dev/null 2>&1
+git -C "${TAP_DIR}" add Formula/codex-mem9.rb
+git -C "${TAP_DIR}" -c user.name="codex-mem9-ci" -c user.email="ci@example.invalid" \
+  commit -m "Initialize smoke tap" >/dev/null
 
 brew untap "${TAP_NAME}" >/dev/null 2>&1 || true
 brew tap "${TAP_NAME}" "${TAP_DIR}"
