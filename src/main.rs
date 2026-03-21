@@ -8,6 +8,7 @@ use codex_mem9::{load_runtime_config, run_sync, run_watch};
 #[derive(Parser, Debug)]
 #[command(name = "codex-mem9")]
 #[command(about = "Sync and watch Codex memories into Mem9 with redaction")]
+#[command(version = concat!("v", env!("CARGO_PKG_VERSION")))]
 struct Cli {
     #[command(subcommand)]
     command: Command,
