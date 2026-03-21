@@ -6,6 +6,27 @@
 
 [中文文档](./README.zh-CN.md)
 
+## What is Mem9?
+
+Mem9 is a memory layer for AI agents. It gives agents a durable place to store and retrieve user preferences, project decisions, and other long-lived context across sessions.
+
+Official links:
+
+- Website: <https://db9.ai/>
+- Quickstart: <https://db9.ai/docs/quickstart>
+- GitHub: <https://github.com/mem9-ai/mem9>
+
+## What is codex-mem9?
+
+`codex-mem9` is the Codex-side integration layer for Mem9.
+
+It does two jobs:
+
+- installs agent-readable `skills/` so a Codex-style agent can recall, store, and manage Mem9 memory
+- provides a local CLI and background service that imports `~/.codex/memories`, redacts sensitive content, and syncs sanitized entries into Mem9
+
+It is not the Mem9 service itself, and it does not run a standalone database locally. Mem9 remains the remote memory backend. `codex-mem9` is the local bridge that connects Codex-style agent workflows to that backend.
+
 `codex-mem9` provides two installable parts for AI agents:
 
 - `skills/`: Mem9 skills for Codex-style agents

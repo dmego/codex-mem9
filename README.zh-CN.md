@@ -6,6 +6,27 @@
 
 [English README](./README.md)
 
+## 什么是 Mem9
+
+Mem9 是一层给 AI agent 使用的记忆能力，用来在多轮和跨会话场景里持久化保存并检索用户偏好、项目决策以及其他长期上下文。
+
+官方链接：
+
+- 官网：<https://db9.ai/>
+- 快速开始：<https://db9.ai/docs/quickstart>
+- GitHub：<https://github.com/mem9-ai/mem9>
+
+## 什么是 codex-mem9
+
+`codex-mem9` 是面向 Codex 一类 agent 的 Mem9 本地接入层。
+
+它主要做两件事：
+
+- 提供可被 agent 读取的 `skills/`，让 Codex 风格 agent 可以回忆、存储和管理 Mem9 记忆
+- 提供本地 CLI 和后台服务，把 `~/.codex/memories` 中的内容导入出来，做脱敏处理，再同步到 Mem9
+
+它不是 Mem9 服务本身，也不会在本地启动一个独立数据库。Mem9 仍然是远端记忆后端，而 `codex-mem9` 负责把 Codex 风格 agent 的本地工作流接到这个后端上。
+
 `codex-mem9` 提供两部分可安装内容，供 AI agent 使用：
 
 - `skills/`：给 Codex 一类 agent 使用的 Mem9 skills
